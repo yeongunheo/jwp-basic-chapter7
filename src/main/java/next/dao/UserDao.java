@@ -12,31 +12,21 @@ import next.model.User;
 
 public class UserDao {
 	
-	private Connection con = null;
-	private PreparedStatement pstmt = null;
-	private ResultSet rs = null;
+	Connection con = null;
+	PreparedStatement pstmt = null;
+	ResultSet rs = null;
 	
     public void insert(User user) throws SQLException {
-        try {
-            con = ConnectionManager.getConnection();
-            String sql = createQueryForInsert();
-            setValuesForInsert(user, pstmt, sql);
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
-            }
-
-            if (con != null) {
-                con.close();
-            }
-        }
+    	InsertJdbcTemplate insertJdbc = new InsertJdbcTemplate();
+    	UserDao userDao = new UserDao();
+    	insertJdbc.insert(user, userDao);
     }
     
-    private String createQueryForInsert() {
+    String createQueryForInsert() {
     	return "INSERT INTO USERS VALUES (?, ?, ?, ?)";
     }
     
-    private void setValuesForInsert(User user, PreparedStatement pstmt, String sql) {
+    void setValuesForInsert(User user, PreparedStatement pstmt, String sql) {
     	try {
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, user.getUserId());
@@ -49,29 +39,17 @@ public class UserDao {
 		}
     }
 
-    //------------------------------------------------------------------------------------
-    
     public void update(User user) throws SQLException {
-        try {
-        	con = ConnectionManager.getConnection();
-            String sql = createQueryForUpdate();
-            setValuesForUpdate(user, pstmt, sql);
-        } finally {
-        	if (pstmt != null) {
-                pstmt.close();
-            }
-
-            if (con != null) {
-                con.close();
-            }
-        }
+        UpdateJdbcTemplate updateJdbc = new UpdateJdbcTemplate();
+        UserDao userDao = new UserDao();
+        updateJdbc.update(user, userDao);
     }
     
-    private String createQueryForUpdate() {
+    String createQueryForUpdate() {
     	return "UPDATE USERS SET password = ?, name = ?, email = ? WHERE userid=?";
     }
 
-    private void setValuesForUpdate(User user, PreparedStatement pstmt, String sql) {
+    void setValuesForUpdate(User user, PreparedStatement pstmt, String sql) {
     	try {
 			pstmt = con.prepareStatement(sql);
             pstmt.setString(1, user.getPassword());
